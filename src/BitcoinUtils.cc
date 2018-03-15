@@ -28,6 +28,11 @@ std::string EncodeHexBlock(const CBlock &block) {
   ssBlock << block;
   return HexStr(ssBlock.begin(), ssBlock.end());
 }
+std::string EncodeHexBlockHeader(const CBlockHeader &blkHeader) {
+  CDataStream ssBlkHeader(SER_NETWORK, PROTOCOL_VERSION);
+  ssBlkHeader << blkHeader;
+  return HexStr(ssBlkHeader.begin(), ssBlkHeader.end());
+}
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
@@ -47,7 +52,7 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
   return nSubsidy;
 }
 
-#ifdef CHAIN_TYPE_SBTC
+//#ifdef CHAIN_TYPE_SBTC
 
 CTxDestination DecodeDestination(const std::string& str) {
   CBitcoinAddress addr(str);
@@ -59,4 +64,4 @@ bool IsValidDestinationString(const std::string& str) {
   return addr.IsValid();
 }
 
-#endif // CHAIN_TYPE_SBTC
+//#endif // CHAIN_TYPE_SBTC
