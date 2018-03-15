@@ -119,9 +119,6 @@ class BlockMaker {
                                   const string &rpcAddress,
                                   const string &rpcUserpass);
 
-  void submitRskBlockNonBlocking(const string &rpcAddress,
-                                const string &rpcUserPwd,
-                                const string &blockHex);
   void submitRskBlockPartialMerkleNonBlocking(const string &rpcAddress,
                                                 const string &rpcUserPwd,
                                                 const string &blockHashHex, 
@@ -130,9 +127,6 @@ class BlockMaker {
                                                 const string &merkleHashesHex, 
                                                 const string &totalTxCount);
 
-  void _submitRskBlockThread(const string &rpcAddress,
-                            const string &rpcUserPwd,
-                            const string &blockHex);
   void _submitRskBlockPartialMerkleThread(const string &rpcAddress,
                                           const string &rpcUserPwd,
                                           const string &blockHashHex, 
