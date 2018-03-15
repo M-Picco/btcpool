@@ -56,6 +56,8 @@ class BlockMaker {
   size_t kMaxStratumJobNum_;
   // key: jobId, value: gbthash
   std::map<uint64_t, uint256> jobId2GbtHash_;
+  // key: JobId, value: job's merkleBranch_
+  std::map<uint64_t, shared_ptr<vector<uint256> > > jobId2MerkleBranch_;
 
   bpt::ptime lastSubmittedBlockTime;
   uint32_t submittedRskBlocks;
@@ -120,10 +122,24 @@ class BlockMaker {
   void submitRskBlockNonBlocking(const string &rpcAddress,
                                 const string &rpcUserPwd,
                                 const string &blockHex);
+  void submitRskBlockPartialMerkleNonBlocking(const string &rpcAddress,
+                                                const string &rpcUserPwd,
+                                                const string &blockHashHex, 
+                                                const string &blockHeaderHex, 
+                                                const string &coinbaseHex, 
+                                                const string &merkleHashesHex, 
+                                                const string &totalTxCount);
 
   void _submitRskBlockThread(const string &rpcAddress,
                             const string &rpcUserPwd,
                             const string &blockHex);
+  void _submitRskBlockPartialMerkleThread(const string &rpcAddress,
+                                          const string &rpcUserPwd,
+                                          const string &blockHashHex, 
+                                          const string &blockHeaderHex, 
+                                          const string &coinbaseHex, 
+                                          const string &merkleHashesHex, 
+                                          const string &totalTxCount);
   bool submitToRskNode();
 
 public:

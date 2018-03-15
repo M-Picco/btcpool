@@ -1239,15 +1239,35 @@ int Server::checkShare(const Share &share,
     // send to kafka topic
     //
     string buf;
-    buf.resize(sizeof(RskSolvedShareData) + coinbaseBin.size());
+    size_t merkleBranchCount = sjob->merkleBranch_.size(); 
+    size_t merkleBranchSize = merkleBranchCount * sizeof(uint256);
+
+    size_t coinbaseSize = coinbaseBin.size();
+
+    buf.resize(sizeof(RskSolvedShareData) + sizeof(size_t) + coinbaseSize + sizeof(size_t) + merkleBranchSize);
     uint8_t *p = (uint8_t *)buf.data();
 
     // RskSolvedShareData
     memcpy(p, (const uint8_t *)&shareData, sizeof(RskSolvedShareData));
     p += sizeof(RskSolvedShareData);
 
+    // coinbase size
+    memcpy(p, &coinbaseSize, sizeof(size_t));
+    p += sizeof(size_t);
+
     // coinbase TX
     memcpy(p, coinbaseBin.data(), coinbaseBin.size());
+    p += coinbaseBin.size();
+
+    // merkleBranch count
+    memcpy(p, (const uint8_t *)&merkleBranchCount, sizeof(size_t));
+    p += sizeof(size_t);
+
+    // merkleBranch
+    for (size_t i = 0; i < merkleBranchCount; i++) {
+      memcpy(p, &sjob->merkleBranch_[i], sizeof(uint256));
+      p += sizeof(uint256);
+    }
 
     kafkaProducerRskSolvedShare_->produce(buf.data(), buf.size());
 
