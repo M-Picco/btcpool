@@ -90,6 +90,23 @@ bool Hex2Bin(const char *in, vector<char> &out) {
   return true;
 }
 
+void Bin2HexR(const uint8 *in, size_t len, string &str) {
+  /*str.clear();
+  const uint8 *p = in + len - 1;
+  while (len--) {
+    str.push_back(_hexchars[p[0] >> 4]);
+    str.push_back(_hexchars[p[0] & 0xf]);
+    --p;
+  }*/
+  const uint8 *p = in + len;
+  while (len >= 0) {
+    str.push_back(_hexchars[p[0] >> 4]);
+    str.push_back(_hexchars[p[0] & 0xf]);
+    p--;
+    len--;
+  }
+}
+
 void Bin2Hex(const uint8 *in, size_t len, string &str) {
   str.clear();
   const uint8 *p = in;

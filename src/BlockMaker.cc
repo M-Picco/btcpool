@@ -934,7 +934,10 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     CDataStream c(sdata, SER_NETWORK, PROTOCOL_VERSION);
     c >> tx;
 
-    coinbaseHashHex = tx.GetHash().ToString();
+    coinbaseHashHex.reserve(64);
+    LOG(INFO) << "COINBASE HASH: " << tx.GetHash().GetHex();
+    Bin2HexR((uint8_t*)tx.GetHash().begin(), sizeof(uint256), coinbaseHashHex);
+    LOG(INFO) << "COINBASE REVERSE HASH: " << coinbaseHashHex;
   }
 
   if (submitToRskNode()) { // TODO: se puede mover el condicional al principio del método?
@@ -951,7 +954,11 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     merkleHashesHex.append(coinbaseHashHex);
     for (size_t i = 0; i < merkleBranchCount; i++) {
       merkleHashesHex.append("\x20");
-      merkleHashesHex.append(merkleBranch[i].ToString());
+      string reverseHash;
+      LOG(INFO) << "HASH: " << merkleBranch[i].GetHex();
+      Bin2HexR((uint8_t*)merkleBranch[i].begin(), sizeof(uint256), reverseHash);
+      LOG(INFO) << "REVERSE HASH: " << reverseHash;
+      merkleHashesHex.append(reverseHash);
     }
 
     // coinbase bin -> hex
