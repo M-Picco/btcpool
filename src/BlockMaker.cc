@@ -923,7 +923,7 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     vtxs = rawGbtMap_[gbtHash];
   }
   assert(vtxs.get() != nullptr);
-
+  const size_t HASH_SIZE_IN_BYTE = 32;
   // get coinbase hash
   string coinbaseHashHex;
   {
@@ -934,10 +934,7 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     CDataStream c(sdata, SER_NETWORK, PROTOCOL_VERSION);
     c >> tx;
 
-    coinbaseHashHex.reserve(64);
-    LOG(INFO) << "COINBASE HASH: " << tx.GetHash().GetHex();
-    Bin2HexR((uint8_t*)tx.GetHash().begin(), sizeof(uint256), coinbaseHashHex);
-    LOG(INFO) << "COINBASE REVERSE HASH: " << coinbaseHashHex;
+    Bin2HexReverseByByte((uint8_t*)tx.GetHash().begin(), HASH_SIZE_IN_BYTE, coinbaseHashHex);
   }
 
   if (submitToRskNode()) { // TODO: se puede mover el condicional al principio del método?
@@ -955,9 +952,7 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     for (size_t i = 0; i < merkleBranchCount; i++) {
       merkleHashesHex.append("\x20");
       string reverseHash;
-      LOG(INFO) << "HASH: " << merkleBranch[i].GetHex();
-      Bin2HexR((uint8_t*)merkleBranch[i].begin(), sizeof(uint256), reverseHash);
-      LOG(INFO) << "REVERSE HASH: " << reverseHash;
+      Bin2HexReverseByByte((uint8_t*)merkleBranch[i].begin(), HASH_SIZE_IN_BYTE, reverseHash);
       merkleHashesHex.append(reverseHash);
     }
 
@@ -967,7 +962,7 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
 
     LOG(INFO) << "submit RSK block: " << blockHashHex;
     submitRskBlockPartialMerkleNonBlocking(shareData.rpcAddress_, shareData.rpcUserPwd_, 
-                                           blockHashHex, blockHeaderHex, coinbaseHex, merkleHashesHex, totalTxCountHex);  // using thread    
+                                           blockHashHex, blockHeaderHex, coinbaseHex, merkleHashesHex, totalTxCountHex);  // using thread
   }
 }
 

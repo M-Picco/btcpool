@@ -64,7 +64,6 @@ bool Hex2Bin(const char *in, size_t size, vector<char> &out) {
     out.push_back((h << 4) | l);
   }
   return true;
-
 }
 
 bool Hex2Bin(const char *in, vector<char> &out) {
@@ -90,20 +89,14 @@ bool Hex2Bin(const char *in, vector<char> &out) {
   return true;
 }
 
-void Bin2HexR(const uint8 *in, size_t len, string &str) {
-  /*str.clear();
-  const uint8 *p = in + len - 1;
-  while (len--) {
-    str.push_back(_hexchars[p[0] >> 4]);
-    str.push_back(_hexchars[p[0] & 0xf]);
-    --p;
-  }*/
-  const uint8 *p = in + len;
-  while (len >= 0) {
-    str.push_back(_hexchars[p[0] >> 4]);
-    str.push_back(_hexchars[p[0] & 0xf]);
-    p--;
-    len--;
+void Bin2HexReverseByByte(const uint8 *in, size_t len, string &str) {
+  size_t counter = 0;
+
+  while (counter < len) {
+    str.push_back(_hexchars[in[0] >> 4]);
+    str.push_back(_hexchars[in[0] & 0xf]);
+    in++;
+    counter++;
   }
 }
 
