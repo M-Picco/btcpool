@@ -933,7 +933,7 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     CDataStream c(sdata, SER_NETWORK, PROTOCOL_VERSION);
     c >> tx;
 
-    Bin2HexReverseByByte((uint8_t*)tx.GetHash().begin(), HASH_SIZE_IN_BYTE, coinbaseHashHex);
+    Bin2HexReverseByByte((uint8_t*)tx.GetHash().begin(), hash_size_in_bytes, coinbaseHashHex);
   }
 
   if (submitToRskNode()) { // TODO: se puede mover el condicional al principio del método?
