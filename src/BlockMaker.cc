@@ -817,6 +817,7 @@ void BlockMaker::_submitRskBlockPartialMerkleThread(const string &rpcAddress,
                                       const string &coinbaseHex, 
                                       const string &merkleHashesHex, 
                                       const string &totalTxCount) {
+
   string request = "{\"jsonrpc\":\"2.0\",\"id\":\"1\",\"method\":\"mnr_submitBitcoinBlockPartialMerkle\",\"params\":[";
   request += "\"" + blockHashHex + "\", ";
   request += "\"" + blockHeaderHex + "\", ";
@@ -960,7 +961,6 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     string coinbaseHex;
     Bin2Hex(coinbaseTxBin, coinbaseHex);
 
-    LOG(INFO) << "submit RSK block: " << blockHashHex;
     submitRskBlockPartialMerkleNonBlocking(shareData.rpcAddress_, shareData.rpcUserPwd_, 
                                            blockHashHex, blockHeaderHex, coinbaseHex, merkleHashesHex, totalTxCountHex);  // using thread
   }
