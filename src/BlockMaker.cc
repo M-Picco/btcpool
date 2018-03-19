@@ -924,7 +924,8 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     vtxs = rawGbtMap_[gbtHash];
   }
   assert(vtxs.get() != nullptr);
-  const size_t HASH_SIZE_IN_BYTE = 32;
+
+  const size_t hash_size_in_bytes = 32;
   // get coinbase hash
   string coinbaseHashHex;
   {
@@ -953,7 +954,7 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     for (size_t i = 0; i < merkleBranchCount; i++) {
       merkleHashesHex.append("\x20");
       string reverseHash;
-      Bin2HexReverseByByte((uint8_t*)merkleBranch[i].begin(), HASH_SIZE_IN_BYTE, reverseHash);
+      Bin2HexReverseByByte((uint8_t*)merkleBranch[i].begin(), hash_size_in_bytes, reverseHash);
       merkleHashesHex.append(reverseHash);
     }
 
