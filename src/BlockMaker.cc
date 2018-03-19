@@ -22,7 +22,10 @@
  THE SOFTWARE.
  */
 #include "BlockMaker.h"
+ 
 
+
+ 
 #include <boost/thread.hpp>
 
 #include <consensus/merkle.h>
