@@ -40,7 +40,6 @@
 bool Hex2Bin(const char *in, size_t size, vector<char> &out);
 bool Hex2Bin(const char *in, vector<char> &out);
 void Bin2Hex(const uint8 *in, size_t len, string &str);
-void Bin2HexReverseByByte(const uint8 *in, size_t len, string &str);
 void Bin2Hex(const vector<char> &in, string &str);
 void Bin2HexR(const vector<char> &in, string &str);
 

@@ -1244,6 +1244,7 @@ int Server::checkShare(const Share &share,
 
     size_t coinbaseSize = coinbaseBin.size();
 
+    // Space for sharedata + coinbase size + coinbase + merkle branch count + merkle branch
     buf.resize(sizeof(RskSolvedShareData) + sizeof(size_t) + coinbaseSize + sizeof(size_t) + merkleBranchSize);
     uint8_t *p = (uint8_t *)buf.data();
 

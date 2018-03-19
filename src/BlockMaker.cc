@@ -900,6 +900,7 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
 
     merkleBranch.reserve(merkleBranchCount);
     
+    // copy merkle branch hashes
     for (size_t i = 0; i < merkleBranchCount; i++) {
       memcpy(&merkleBranch[i], p, sizeof(uint256));
       p += sizeof(uint256);
@@ -925,7 +926,6 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
   }
   assert(vtxs.get() != nullptr);
 
-  const size_t hash_size_in_bytes = 32;
   // get coinbase hash
   string coinbaseHashHex;
   {
@@ -936,26 +936,26 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     CDataStream c(sdata, SER_NETWORK, PROTOCOL_VERSION);
     c >> tx;
 
-    Bin2HexReverseByByte((uint8_t*)tx.GetHash().begin(), hash_size_in_bytes, coinbaseHashHex);
+    Bin2Hex((uint8_t*)tx.GetHash().begin(), sizeof(uint256), coinbaseHashHex);
   }
 
-  if (submitToRskNode()) { // TODO: se puede mover el condicional al principio del método?
+  if (submitToRskNode()) {
     
     std::stringstream sstream;
     sstream << std::hex << (1 + vtxs->size()); // coinbase + txs
     string totalTxCountHex(sstream.str());
 
-    string blockHashHex = blkHeader.GetHash().ToString(); // GetHash returns uint256. see https://github.com/bitcoin/bitcoin/blob/master/src/primitives/block.h
+    string blockHashHex = blkHeader.GetHash().ToString();
     string blockHeaderHex = EncodeHexBlockHeader(blkHeader);
     
-    // build coinbase's partial merkle tree
-    string merkleHashesHex; 
+    // build coinbase's merkle tree branch
+    string merkleHashesHex;
     merkleHashesHex.append(coinbaseHashHex);
     for (size_t i = 0; i < merkleBranchCount; i++) {
       merkleHashesHex.append("\x20");
-      string reverseHash;
-      Bin2HexReverseByByte((uint8_t*)merkleBranch[i].begin(), hash_size_in_bytes, reverseHash);
-      merkleHashesHex.append(reverseHash);
+      string hashHex;
+      Bin2Hex((uint8_t*)merkleBranch[i].begin(), sizeof(uint256), hashHex);
+      merkleHashesHex.append(hashHex);
     }
 
     // coinbase bin -> hex
