@@ -22,17 +22,11 @@
  THE SOFTWARE.
  */
 #include "BlockMaker.h"
- 
-
-
- 
 #include <boost/thread.hpp>
-
 #include <consensus/merkle.h>
 #include <core_io.h>
 #include "BitcoinUtils.h"
 #include "utilities_js.hpp"
-
 #include "rsk/RskSolvedShareData.h"
 
 
