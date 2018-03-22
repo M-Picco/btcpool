@@ -52,7 +52,7 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
   return nSubsidy;
 }
 
-//#ifdef CHAIN_TYPE_SBTC
+#ifdef CHAIN_TYPE_SBTC
 
 CTxDestination DecodeDestination(const std::string& str) {
   CBitcoinAddress addr(str);
@@ -64,4 +64,4 @@ bool IsValidDestinationString(const std::string& str) {
   return addr.IsValid();
 }
 
-//#endif // CHAIN_TYPE_SBTC
+#endif // CHAIN_TYPE_SBTC
