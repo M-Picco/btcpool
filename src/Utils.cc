@@ -148,10 +148,25 @@ struct CurlChunk {
 static size_t
 CurlWriteChunkCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
+  size_t maxsize = std::numeric_limits<size_t>::max();
+
+  if (nmemb > 0 && size > maxsize / nmemb) {
+    /* overflow! */
+    printf("integer multiplication overflow (size * n > maximum size)\n");
+    return 0;
+  }
+
   size_t realsize = size * nmemb;
   struct CurlChunk *mem = (struct CurlChunk *)userp;
 
-  mem->memory = (char *)realloc(mem->memory, mem->size + realsize + 1);
+  if (mem->size > maxsize - (realsize + 1)) {
+    /* overflow! */
+    printf("integer addition overflow (newsize < size)\n");
+    return 0;
+  }
+
+  size_t newsize = mem->size + realsize + 1;
+  mem->memory = (char *)realloc(mem->memory, newsize);
   if(mem->memory == NULL) {
     /* out of memory! */
     printf("not enough memory (realloc returned NULL)\n");
