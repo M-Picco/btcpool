@@ -1193,8 +1193,8 @@ int Server::checkShare(const Share &share,
     foundBlock.workerId_ = share.workerHashId_;
     foundBlock.userId_   = share.userId_;
     foundBlock.height_   = sjob->height_;
-    memcpy(foundBlock.header80_, (const uint8_t *)&header, sizeof(CBlockHeader));
-    snprintf(foundBlock.workerFullName_, sizeof(foundBlock.workerFullName_),
+    memcpy(foundBlock.header80_, (const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE);
+    snprintf(foundBlock.workerFullName_, WORKER_NAME_SIZE,
              "%s", workFullName.c_str());
     // send
     sendSolvedShare2Kafka(&foundBlock, coinbaseBin);
@@ -1229,11 +1229,11 @@ int Server::checkShare(const Share &share,
     shareData.userId_   = share.userId_;
     // height = matching bitcoin block height
     shareData.height_   = sjob->height_;
-    snprintf(shareData.feesForMiner_, sizeof(shareData.feesForMiner_), "%s", sjob->feesForMiner_.c_str());
-    snprintf(shareData.rpcAddress_, sizeof(shareData.rpcAddress_), "%s", sjob->rskdRpcAddress_.c_str());
-    snprintf(shareData.rpcUserPwd_, sizeof(shareData.rpcUserPwd_), "%s", sjob->rskdRpcUserPwd_.c_str());
-    memcpy(shareData.header80_, (const uint8_t *)&header, sizeof(CBlockHeader));
-    snprintf(shareData.workerFullName_, sizeof(shareData.workerFullName_), "%s", workFullName.c_str());
+    snprintf(shareData.feesForMiner_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->feesForMiner_.c_str());
+    snprintf(shareData.rpcAddress_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskdRpcAddress_.c_str());
+    snprintf(shareData.rpcUserPwd_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskdRpcUserPwd_.c_str());
+    memcpy(shareData.header80_, (const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE);
+    snprintf(shareData.workerFullName_, WORKER_NAME_SIZE, "%s", workFullName.c_str());
     
     //
     // send to kafka topic
@@ -1268,7 +1268,7 @@ int Server::checkShare(const Share &share,
     // build namecoin solved share message
     //
     string blockHeaderHex;
-    Bin2Hex((const uint8_t *)&header, sizeof(CBlockHeader), blockHeaderHex);
+    Bin2Hex((const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE, blockHeaderHex);
     DLOG(INFO) << "blockHeaderHex: " << blockHeaderHex;
 
     string coinbaseTxHex;
