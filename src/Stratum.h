@@ -280,10 +280,10 @@ public:
   string   nmcRpcUserpass_;
 
   // rsk merged mining
-  string   blockHashForMergedMining_;
+  string   rskBlockHashForMergedMining_;
   string   rskdRpcAddress_;
   string   rskdRpcUserPwd_;
-  string   feesForMiner_;
+  string   rskFeesForMiner_;
   uint256  rskNetworkTarget_;
   bool     isRskCleanJob_;
 

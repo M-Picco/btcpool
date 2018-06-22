@@ -1218,7 +1218,7 @@ int Server::checkShare(const Share &share,
   //
   // found new RSK block
   //
-  if (!sjob->blockHashForMergedMining_.empty() &&
+  if (!sjob->rskBlockHashForMergedMining_.empty() &&
       (isSubmitInvalidBlock_ == true || bnBlockHash <= UintToArith256(sjob->rskNetworkTarget_))) {
     //
     // build data needed to submit block to RSK
@@ -1229,7 +1229,7 @@ int Server::checkShare(const Share &share,
     shareData.userId_   = share.userId_;
     // height = matching bitcoin block height
     shareData.height_   = sjob->height_;
-    snprintf(shareData.feesForMiner_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->feesForMiner_.c_str());
+    snprintf(shareData.rskFeesForMiner_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskFeesForMiner_.c_str());
     snprintf(shareData.rpcAddress_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskdRpcAddress_.c_str());
     snprintf(shareData.rpcUserPwd_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskdRpcUserPwd_.c_str());
     memcpy(shareData.header80_, (const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE);
