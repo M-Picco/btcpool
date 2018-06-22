@@ -49,6 +49,8 @@
 #include "Stratum.h"
 #include "StratumSession.h"
 
+#include "rsk/RskSolvedShareData.h"
+
 class Server;
 class StratumJobEx;
 
@@ -314,6 +316,8 @@ public:
   void sendShare2Kafka      (const uint8_t *data, size_t len);
   void sendSolvedShare2Kafka(const FoundBlock *foundBlock,
                              const std::vector<char> &coinbaseBin);
+  void sendRskSolvedShare2Kafka(const RskSolvedShareData *shareData,
+                                const std::vector<char> &coinbaseBin);
   void sendCommonEvents2Kafka(const string &message);
 };
 

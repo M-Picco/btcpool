@@ -33,8 +33,6 @@
 #include <hash.h>
 #include <inttypes.h>
 
-#include "rsk/RskSolvedShareData.h"
-
 #include "utilities_js.hpp"
 
 
@@ -1235,21 +1233,7 @@ int Server::checkShare(const Share &share,
     memcpy(shareData.header80_, (const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE);
     snprintf(shareData.workerFullName_, WORKER_NAME_SIZE, "%s", workFullName.c_str());
     
-    //
-    // send to kafka topic
-    //
-    string buf;
-    buf.resize(sizeof(RskSolvedShareData) + coinbaseBin.size());
-    uint8_t *p = (uint8_t *)buf.data();
-
-    // RskSolvedShareData
-    memcpy(p, (const uint8_t *)&shareData, sizeof(RskSolvedShareData));
-    p += sizeof(RskSolvedShareData);
-
-    // coinbase TX
-    memcpy(p, coinbaseBin.data(), coinbaseBin.size());
-
-    kafkaProducerRskSolvedShare_->produce(buf.data(), buf.size());
+    sendRskSolvedShare2Kafka(&shareData, coinbaseBin);
 
     //
     // log the finding
@@ -1331,6 +1315,25 @@ void Server::sendSolvedShare2Kafka(const FoundBlock *foundBlock,
   memcpy(p, coinbaseBin.data(), coinbaseBin.size());
 
   kafkaProducerSolvedShare_->produce(buf.data(), buf.size());
+}
+
+void Server::sendRskSolvedShare2Kafka(const RskSolvedShareData *shareData,
+                                      const std::vector<char> &coinbaseBin) {
+  //
+  // send to kafka topic
+  //
+  string buf;
+  buf.resize(sizeof(RskSolvedShareData) + coinbaseBin.size());
+  uint8_t *p = (uint8_t *)buf.data();
+
+  // RskSolvedShareData
+  memcpy(p, (const uint8_t *)shareData, sizeof(RskSolvedShareData));
+  p += sizeof(RskSolvedShareData);
+
+  // coinbase TX
+  memcpy(p, coinbaseBin.data(), coinbaseBin.size());
+
+  kafkaProducerRskSolvedShare_->produce(buf.data(), buf.size());
 }
 
 void Server::sendCommonEvents2Kafka(const string &message) {
