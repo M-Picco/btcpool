@@ -446,20 +446,6 @@ bool StratumJob::initFromGbt(const char *gbt, const string &poolCoinbaseInfo,
     } while (0);
   }
   
-  //
-  // rsk merged mining
-  //
-  if (latestRskBlockJson.isInitialized()) {
-
-    // set rsk info
-    rskBlockHashForMergedMining_ = latestRskBlockJson.getBlockHash();
-    rskNetworkTarget_ = uint256S(latestRskBlockJson.getTarget());
-    rskFeesForMiner_ = latestRskBlockJson.getFees();
-    rskdRpcAddress_ = latestRskBlockJson.getRpcAddress();
-    rskdRpcUserPwd_ = latestRskBlockJson.getRpcUserPwd();
-    isRskCleanJob_ = latestRskBlockJson.getIsCleanJob();
-  }
-
   // make coinbase1 & coinbase2
   {
     CTxIn cbIn;
@@ -572,11 +558,19 @@ bool StratumJob::initFromGbt(const char *gbt, const string &poolCoinbaseInfo,
       cbOut.push_back(witnessTxOut);
     }
 
-    //
-    // output[2]: RSK merge mining
-    // Tips: it may be output[1] if segwit not enabled in a chain (like BitcoinCash).
-    //
     if (latestRskBlockJson.isInitialized()) {
+      // set rsk info
+      rskBlockHashForMergedMining_ = latestRskBlockJson.getBlockHash();
+      rskNetworkTarget_ = uint256S(latestRskBlockJson.getTarget());
+      rskFeesForMiner_ = latestRskBlockJson.getFees();
+      rskdRpcAddress_ = latestRskBlockJson.getRpcAddress();
+      rskdRpcUserPwd_ = latestRskBlockJson.getRpcUserPwd();
+      isRskCleanJob_ = latestRskBlockJson.getIsCleanJob();
+
+      //
+      // output[2]: RSK merge mining
+      // Tips: it may be output[1] if segwit not enabled in a chain (like BitcoinCash).
+      //
       DLOG(INFO) << "RSK blockhash: " << rskBlockHashForMergedMining_;
       string rskBlockTag = "\x52\x53\x4B\x42\x4C\x4F\x43\x4B\x3A"; // "RSKBLOCK:"
       vector<char> rskTag(rskBlockTag.begin(), rskBlockTag.end());
