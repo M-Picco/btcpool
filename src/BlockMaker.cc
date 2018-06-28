@@ -869,9 +869,9 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     coinbaseTxBin.resize(rkmessage->len - sizeof(RskSolvedShareData));
 
     // shareData
-    memcpy((uint8_t *)&shareData, (const uint8_t *)rkmessage->payload, sizeof(RskSolvedShareData));
+    size_t deserializedBytes = shareData.deserializeFrom((const uint8_t *)rkmessage->payload);
     // coinbase tx
-    memcpy((uint8_t *)coinbaseTxBin.data(), (const uint8_t *)rkmessage->payload + sizeof(RskSolvedShareData), coinbaseTxBin.size());
+    memcpy((uint8_t *)coinbaseTxBin.data(), (const uint8_t *)(rkmessage->payload + deserializedBytes), coinbaseTxBin.size());
     // copy header
     memcpy((uint8_t *)&blkHeader, shareData.header80_, BTC_BLOCK_HEADER_SIZE);
   }

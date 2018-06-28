@@ -35,6 +35,9 @@
 
 #define RSK_DATA_STRING_FIELD_SIZE 80
 
+#include "../BitcoinUtils.h"
+#include "../Stratum.h"
+
 class RskSolvedShareData {
 public:
   uint64_t jobId_;
@@ -54,6 +57,9 @@ public:
     memset(rpcAddress_, 0, RSK_DATA_STRING_FIELD_SIZE);
     memset(rpcUserPwd_, 0, RSK_DATA_STRING_FIELD_SIZE);
   }
+
+  size_t serializeTo(uint8_t* buf) const;
+  size_t deserializeFrom(const uint8_t* buf);
 };
 
 #endif

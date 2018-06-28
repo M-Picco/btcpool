@@ -1327,8 +1327,8 @@ void Server::sendRskSolvedShare2Kafka(const RskSolvedShareData *shareData,
   uint8_t *p = (uint8_t *)buf.data();
 
   // RskSolvedShareData
-  memcpy(p, (const uint8_t *)shareData, sizeof(RskSolvedShareData));
-  p += sizeof(RskSolvedShareData);
+  size_t serializedBytes = shareData->serializeTo(p);
+  p += serializedBytes;
 
   // coinbase TX
   memcpy(p, coinbaseBin.data(), coinbaseBin.size());
