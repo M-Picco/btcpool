@@ -347,7 +347,7 @@ void BlockMaker::consumeNamecoinSovledShare(rd_kafka_message_t *rkmessage) {
   const string coinbaseTxHex  = j["coinbase_tx"].str();
   const string rpcAddr        = j["rpc_addr"].str();
   const string rpcUserpass    = j["rpc_userpass"].str();
-  assert(blockHeaderHex.size() == sizeof(CBlockHeader)*2);
+  assert(blockHeaderHex.size() == BTC_BLOCK_HEADER_SIZE * 2);
 
   CBlockHeader blkHeader;
   vector<char> coinbaseTxBin;
@@ -356,7 +356,7 @@ void BlockMaker::consumeNamecoinSovledShare(rd_kafka_message_t *rkmessage) {
   {
     vector<char> binOut;
     Hex2Bin(blockHeaderHex.c_str(), blockHeaderHex.length(), binOut);
-    assert(binOut.size() == sizeof(CBlockHeader));
+    assert(binOut.size() == BTC_BLOCK_HEADER_SIZE);
     memcpy((uint8_t *)&blkHeader, binOut.data(), binOut.size());
   }
 
@@ -530,7 +530,7 @@ void BlockMaker::consumeSovledShare(rd_kafka_message_t *rkmessage) {
            (const uint8_t *)rkmessage->payload + sizeof(FoundBlock),
            coinbaseTxBin.size());
     // copy header
-    memcpy((uint8_t *)&blkHeader, foundBlock.header80_, sizeof(CBlockHeader));
+    memcpy((uint8_t *)&blkHeader, foundBlock.header80_, BTC_BLOCK_HEADER_SIZE);
   }
 
   // get gbtHash and rawgbt (vtxs)
@@ -869,11 +869,11 @@ void BlockMaker::consumeRskSolvedShare(rd_kafka_message_t *rkmessage) {
     coinbaseTxBin.resize(rkmessage->len - sizeof(RskSolvedShareData));
 
     // shareData
-    memcpy((uint8_t *)&shareData, (const uint8_t *)rkmessage->payload, sizeof(RskSolvedShareData));
+    size_t deserializedBytes = shareData.deserializeFrom((const uint8_t *)rkmessage->payload);
     // coinbase tx
-    memcpy((uint8_t *)coinbaseTxBin.data(), (const uint8_t *)rkmessage->payload + sizeof(RskSolvedShareData), coinbaseTxBin.size());
+    memcpy((uint8_t *)coinbaseTxBin.data(), (const uint8_t *)(rkmessage->payload + deserializedBytes), coinbaseTxBin.size());
     // copy header
-    memcpy((uint8_t *)&blkHeader, shareData.header80_, sizeof(CBlockHeader));
+    memcpy((uint8_t *)&blkHeader, shareData.header80_, BTC_BLOCK_HEADER_SIZE);
   }
 
   LOG(INFO) << "submit RSK block: " << blkHeader.GetHash().ToString();

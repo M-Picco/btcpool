@@ -57,6 +57,9 @@
 //       so 500 bytes may enough.
 #define COINBASE_TX_MAX_SIZE   500
 
+#define BTC_BLOCK_HEADER_SIZE sizeof(CBlockHeader)
+#define WORKER_NAME_SIZE 40
+
 // default worker name
 #define DEFAULT_WORKER_NAME    "__default__"
 
@@ -78,12 +81,12 @@ public:
   int64_t  workerId_;  // found by who
   int32_t  userId_;
   int32_t  height_;
-  uint8_t  header80_[80];
-  char     workerFullName_[40];  // <UserName>.<WorkerName>
+  uint8_t  header80_[BTC_BLOCK_HEADER_SIZE];
+  char     workerFullName_[WORKER_NAME_SIZE];  // <UserName>.<WorkerName>
 
   FoundBlock(): jobId_(0), workerId_(0), userId_(0), height_(0) {
-    memset(header80_,       0, sizeof(header80_));
-    memset(workerFullName_, 0, sizeof(workerFullName_));
+    memset(header80_,       0, BTC_BLOCK_HEADER_SIZE);
+    memset(workerFullName_, 0, WORKER_NAME_SIZE);
   }
 };
 
@@ -277,10 +280,10 @@ public:
   string   nmcRpcUserpass_;
 
   // rsk merged mining
-  string   blockHashForMergedMining_;
+  string   rskBlockHashForMergedMining_;
   string   rskdRpcAddress_;
   string   rskdRpcUserPwd_;
-  string   feesForMiner_;
+  string   rskFeesForMiner_;
   uint256  rskNetworkTarget_;
   bool     isRskCleanJob_;
 

@@ -597,9 +597,9 @@ TEST(Stratum, StratumJobWithRskWork) {
     sjob.initFromGbt(gbt.c_str(), poolCoinbaseInfo, poolPayoutAddrTestnet, blockVersion, "", rskWork, 1);
 
     // check rsk required data copied properly to the stratum job
-    ASSERT_EQ(sjob.blockHashForMergedMining_, "0xe6b0a8e84e0ce68471ca28db4f51b71139b0ab78ae1c3e0ae8364604e9f8a15d");
+    ASSERT_EQ(sjob.rskBlockHashForMergedMining_, "0xe6b0a8e84e0ce68471ca28db4f51b71139b0ab78ae1c3e0ae8364604e9f8a15d");
     ASSERT_EQ(sjob.rskNetworkTarget_, uint256S("0x5555555555555555555555555555555555555555555555555555555555555555"));
-    ASSERT_EQ(sjob.feesForMiner_, "0");
+    ASSERT_EQ(sjob.rskFeesForMiner_, "0");
     ASSERT_EQ(sjob.rskdRpcAddress_, "http://10.0.2.2:4444");
     ASSERT_EQ(sjob.rskdRpcUserPwd_, "user:pass");
     ASSERT_EQ(sjob.isRskCleanJob_, false);

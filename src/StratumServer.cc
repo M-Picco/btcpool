@@ -33,8 +33,6 @@
 #include <hash.h>
 #include <inttypes.h>
 
-#include "rsk/RskSolvedShareData.h"
-
 #include "utilities_js.hpp"
 
 
@@ -1193,8 +1191,8 @@ int Server::checkShare(const Share &share,
     foundBlock.workerId_ = share.workerHashId_;
     foundBlock.userId_   = share.userId_;
     foundBlock.height_   = sjob->height_;
-    memcpy(foundBlock.header80_, (const uint8_t *)&header, sizeof(CBlockHeader));
-    snprintf(foundBlock.workerFullName_, sizeof(foundBlock.workerFullName_),
+    memcpy(foundBlock.header80_, (const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE);
+    snprintf(foundBlock.workerFullName_, WORKER_NAME_SIZE,
              "%s", workFullName.c_str());
     // send
     sendSolvedShare2Kafka(&foundBlock, coinbaseBin);
@@ -1218,7 +1216,7 @@ int Server::checkShare(const Share &share,
   //
   // found new RSK block
   //
-  if (!sjob->blockHashForMergedMining_.empty() &&
+  if (!sjob->rskBlockHashForMergedMining_.empty() &&
       (isSubmitInvalidBlock_ == true || bnBlockHash <= UintToArith256(sjob->rskNetworkTarget_))) {
     //
     // build data needed to submit block to RSK
@@ -1229,27 +1227,13 @@ int Server::checkShare(const Share &share,
     shareData.userId_   = share.userId_;
     // height = matching bitcoin block height
     shareData.height_   = sjob->height_;
-    snprintf(shareData.feesForMiner_, sizeof(shareData.feesForMiner_), "%s", sjob->feesForMiner_.c_str());
-    snprintf(shareData.rpcAddress_, sizeof(shareData.rpcAddress_), "%s", sjob->rskdRpcAddress_.c_str());
-    snprintf(shareData.rpcUserPwd_, sizeof(shareData.rpcUserPwd_), "%s", sjob->rskdRpcUserPwd_.c_str());
-    memcpy(shareData.header80_, (const uint8_t *)&header, sizeof(CBlockHeader));
-    snprintf(shareData.workerFullName_, sizeof(shareData.workerFullName_), "%s", workFullName.c_str());
+    snprintf(shareData.rskFeesForMiner_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskFeesForMiner_.c_str());
+    snprintf(shareData.rpcAddress_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskdRpcAddress_.c_str());
+    snprintf(shareData.rpcUserPwd_, RSK_DATA_STRING_FIELD_SIZE, "%s", sjob->rskdRpcUserPwd_.c_str());
+    memcpy(shareData.header80_, (const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE);
+    snprintf(shareData.workerFullName_, WORKER_NAME_SIZE, "%s", workFullName.c_str());
     
-    //
-    // send to kafka topic
-    //
-    string buf;
-    buf.resize(sizeof(RskSolvedShareData) + coinbaseBin.size());
-    uint8_t *p = (uint8_t *)buf.data();
-
-    // RskSolvedShareData
-    memcpy(p, (const uint8_t *)&shareData, sizeof(RskSolvedShareData));
-    p += sizeof(RskSolvedShareData);
-
-    // coinbase TX
-    memcpy(p, coinbaseBin.data(), coinbaseBin.size());
-
-    kafkaProducerRskSolvedShare_->produce(buf.data(), buf.size());
+    sendRskSolvedShare2Kafka(&shareData, coinbaseBin);
 
     //
     // log the finding
@@ -1268,7 +1252,7 @@ int Server::checkShare(const Share &share,
     // build namecoin solved share message
     //
     string blockHeaderHex;
-    Bin2Hex((const uint8_t *)&header, sizeof(CBlockHeader), blockHeaderHex);
+    Bin2Hex((const uint8_t *)&header, BTC_BLOCK_HEADER_SIZE, blockHeaderHex);
     DLOG(INFO) << "blockHeaderHex: " << blockHeaderHex;
 
     string coinbaseTxHex;
@@ -1331,6 +1315,25 @@ void Server::sendSolvedShare2Kafka(const FoundBlock *foundBlock,
   memcpy(p, coinbaseBin.data(), coinbaseBin.size());
 
   kafkaProducerSolvedShare_->produce(buf.data(), buf.size());
+}
+
+void Server::sendRskSolvedShare2Kafka(const RskSolvedShareData *shareData,
+                                      const std::vector<char> &coinbaseBin) {
+  //
+  // send to kafka topic
+  //
+  string buf;
+  buf.resize(sizeof(RskSolvedShareData) + coinbaseBin.size());
+  uint8_t *p = (uint8_t *)buf.data();
+
+  // RskSolvedShareData
+  size_t serializedBytes = shareData->serializeTo(p);
+  p += serializedBytes;
+
+  // coinbase TX
+  memcpy(p, coinbaseBin.data(), coinbaseBin.size());
+
+  kafkaProducerRskSolvedShare_->produce(buf.data(), buf.size());
 }
 
 void Server::sendCommonEvents2Kafka(const string &message) {
